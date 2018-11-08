@@ -83,10 +83,10 @@
                                 </td>
                             </tr>
                         </thead>
-                        <tbody > 
-                            @foreach($heading as $key => $hdata)
+                        <tbody id="tt"> 
+                            @foreach($heading as $head => $hdata)
 
-                                <tr id={{$key}}>
+                                <tr id={{$head}}>
                                 
                                     <td>
                                         <input type="hidden" name="{{$hdata}}" value="" >
@@ -99,12 +99,12 @@
                                     <td>
                                             <select class="form-control" style="padding-left:20px;" name="{{$hdata}}" placeholder="Please Select">
                                                 <option value="" disabled selected>Select your option</option>
-                                                @foreach ($select as $option)
-                                                    @if($key == $option->header)
-                                                        //如果迴圈符合預設選取
-                                                        <option value="{{$option->header}}" selected>{{$option->header}}</option>
-                                                    @else//如果不符合就跑一般選項
-                                                        <option value="{{$option->header}}">{{$option->header}}</option>
+                                                @foreach ($select as $skey =>$sdata)
+                                                	{{$skey}}{{$sdata}}
+                                                    @if($hdata == $sdata->header)
+                                                        <option value="{{$sdata->header}}" selected='true'>{{$head}}{{$skey}}{{$sdata->header}}</option>
+                                                    @else
+                                                        <option value="{{$sdata->header}}">{{$skey}}{{$sdata->header}}</option>
                                                     @endif        
                                                 @endforeach
                                             </select>
@@ -128,12 +128,23 @@
 
 <script>
     function CreateRow() {
-        var rows = document.getElementById('mytable').rows.length;
-        $('#mytable').find('tbody').append(
-        "<tr id="+rows+"><td>"+"<input type='text' name='123' value='' >"+"</td><td></td><td></td></tr>" 
-        );
-       
-        console.log(rows);
+
+        //$('#mytable').find('tbody').append(
+        //"<tr id="+rows+"><td></td><td>"+"<input type='text' name='123' value='' class='form-control' >"+"</td><td></td></tr>" 
+        //);
+        
+        //取array數當ID
+		var rows = document.getElementById('mytable').rows.length;		
+
+        var boxes = document.getElementById("tt");
+		var clone = boxes.children[1].cloneNode(true);
+		console.log(rows);
+		clone.id = rows;
+		var firstd = clone.firstElementChild;
+		firstd.innerHTML = 'New_'+rows;
+		var lastd = clone.lastElementChild;
+		lastd.lastElementChild.setAttribute('name',rows);
+		boxes.appendChild(clone);
 
     }
     

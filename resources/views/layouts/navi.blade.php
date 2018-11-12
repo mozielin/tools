@@ -44,26 +44,27 @@
         <li class="nav-item start ">
             <a href="/home" class="nav-link nav-toggle">
                 <i class="icon-home"></i>
-                <span class="title">Home</span>
+                <span class="title">首頁</span>
                 <span class="arrow"></span>
             </a>
         </li>
         <li class="heading">
-            <h3 class="uppercase">Features</h3>
+            <h3 class="uppercase">轉檔工具</h3>
         </li>
         <li class="nav-item  ">
             <a href="{{ route('import') }}" class="nav-link nav-toggle">
                 <i class="icon-paper-plane"></i>
-                <span class="title">New Custom</span>
+                <span class="title">建立新轉換模板</span>
                 <span class="plus"></span>
             </a>
         </li>
         <li class="nav-item  ">
-            <a href="javascript:;" class="nav-link nav-toggle">
+            <a href="{{ route('import_list') }}" class="nav-link nav-toggle">
                 <i class="icon-diamond"></i>
-                <span class="title">Templete List</span>
-                <span class="arrow"></span>
+                <span class="title">執行檔案轉換</span>
+                <span class="plus"></span>
             </a>
+            @permission('Devenlope')
             <ul class="sub-menu">
                 <li class="nav-item  ">
                     <a href="{{route('import_list')}}" class="nav-link ">
@@ -80,11 +81,37 @@
                         <span class="title">Metronic Grid System</span>
                     </a>
                 </li>
-                
             </ul>
-
+            @endpermission
         </li>
-        
+        @role('devenlope')
+        <li class="nav-item  ">
+            <a href="{{ route('role_index') }}" class="nav-link nav-toggle">
+                <i class="icon-diamond"></i>
+                <span class="title">Role</span>
+                <span class="plus"></span>
+            </a>
+           
+            <ul class="sub-menu">
+                <li class="nav-item  ">
+                    <a href="{{route('role_index')}}" class="nav-link ">
+                        <span class="title">Metronic Grid System</span>
+                    </a>
+                </li>
+                <li class="nav-item  ">
+                    <a href="ui_metronic_grid.html" class="nav-link ">
+                        <span class="title">Metronic Grid System</span>
+                    </a>
+                </li>
+                <li class="nav-item  ">
+                    <a href="ui_metronic_grid.html" class="nav-link ">
+                        <span class="title">Metronic Grid System</span>
+                    </a>
+                </li>
+            </ul>
+            
+        </li>
+        @endrole
     </ul>
     <!-- END SIDEBAR MENU -->
     <!-- END SIDEBAR MENU -->

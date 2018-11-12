@@ -53,8 +53,10 @@ class ImportController extends Controller
 			$select = Select::all();
 
 			$tmpname = $request->excel->getPathName();
+			$tmpsname = $request->sample->getPathName();
 
 			$data = \Excel::load($tmpname)->all();
+			$sample = \Excel::load($tmpsname)->all(); 
 
 			$id = Auth::id();
 
@@ -63,11 +65,13 @@ class ImportController extends Controller
 			//附件檔名儲存
             $filename = $request->excel->getClientOriginalName();
             $store = $request->file('excel')->store('public/export');  
+            //dd($store);
             $getorigin = sscanf($store,'public/export/%s',$origin_file);
            	
 
 			$firstrow = $data->first();
-			$heading = $data->getHeading();
+			$heading = $sample->getHeading();
+			$shead =  $data->getHeading();
 			$listname = null;
 
 			//return dd($tmpname,$data,$heading,$firstrow);
@@ -78,6 +82,7 @@ class ImportController extends Controller
 				->with('select',$select)
 				->with('data',$data)
 				->with('listname',$listname)
+				->with('shead',$shead)
 				->with('origin_file',$origin_file);
 			
 		}
@@ -94,9 +99,7 @@ class ImportController extends Controller
 
 		$jsondata = json_encode($data);
 
-		//dd($jsondata);
-
-		 if($request->listname != null){  
+		if($request->listname != null){  
             $savedata = Reorder::firstOrCreate(
                 ['listname' => $request->listname,'user_id' => Auth::id()],
                 ['jsondata' => $jsondata,]
@@ -108,39 +111,44 @@ class ImportController extends Controller
 
 			$savedata ->save();
         }
+ 		
+		$sourcedata = \Excel::load('storage/app/public/export/'.$origin_file)->all()->toArray();
 
-		//return dd($data,$okey, $nkey,$jsondata);
-
-		$sourcedata = \Excel::load('storage/export/'.$origin_file)->all()->toArray();
-
-		\Storage::delete("/public/export/".$origin_file);
+		$addrow = array_diff_key($data,$sourcedata[0]);
+		dd($data,$okey, $nkey,$sourcedata[0],$addrow);
+		$faddrow = array_flip($addrow);
+		
+		//$newk = array_flip($data);
+	//dd($data,$addrow,$newk);
+		foreach ($data as $oskey => $osvalue) {
+				$order[$oskey] = $osvalue ;
+			foreach ($addrow as $akey => $avalue) {
+					//dd($rvalue[$oskey] ,$akey);
+				if ($oskey == $akey) {
+					$order[$oskey] = $akey ;
+				}
+			}
+		}
+		dd($data,$addrow,$order);
+		//還沒成功刪除(unfix)
+		\Storage::delete('app/public/export/'.$origin_file);
 
 		foreach ($sourcedata as $value) {
-			//dd($okey,$value);
-		  $tmpdata = array_merge(array_flip($okey),$value);
-
-		  list($okeys, $ovalue) = array_divide($tmpdata);
-
-		  //dd($nkey,$ovalue);
-
-		  $cdata = array_combine($nkey, $ovalue);
-
-		  $newk = array_filter($nkey);
-
-		  $exportdata[] = array_intersect_key($cdata,array_flip($newk));
-
-		  //$exportdata [] = array_splice($stmpdata, offset)
-
-		   //dd($okey,$value,$tmpdata,$nkey,$newk,$ovalue,$exportdata);
-
+		  $nvalue = $value+array_flip($addrow);
+		 
+		  foreach ($order as $rkey => $rvalue) {
+				$ready[$rvalue] = $rvalue ;
+			foreach ($nvalue as $nkey => $value) {
+				if ($nkey == $rkey) {
+					$ready[$rvalue] = $value ;
+				}
+			}
+		  }
+		  $exportdata[] = $ready;
 		}
-
-		//return dd($exportdata);
-		//Storage::delete("/public/export/".$origin_file);
+		 dd($nvalue,$order,$exportdata);
 
 		$exportname = str_random(40);
-
-		//\Session::flash(Auth::user()->email, $exportname);
 
     	\Excel::create($exportname, function($excel)use($exportdata) {
 	    	$excel->sheet('sheet', function($sheet)use($exportdata) {
@@ -149,17 +157,10 @@ class ImportController extends Controller
 	    	
 	    });
 
-	   
-
-	   // return redirect()->action('ImportController@Download');
-		//$filepath = 'storage/export/'.$exportname;
-		
-		//dd($filepath);
   		return view('/import/start_download')
   				->with('listname',$listname)
   				->with('filepath',$exportname);
             //return $this->Download($listname,$exportname);
-
     }
 
     public function Upload_list(Request $request)
@@ -169,7 +170,7 @@ class ImportController extends Controller
 
 		if ($request->hasFile('excel')){
 
-			$select = Select::all();
+			//$select = Select::all();
 
 			$tmpname = $request->excel->getPathName();
 
@@ -181,11 +182,7 @@ class ImportController extends Controller
             $filename = $request->excel->getClientOriginalName();
             $store = $request->file('excel')->store('public/export');  
             $getorigin = sscanf($store,'public/export/%s',$origin_file);
-           //	$file = new Upload;
-           //	$file->user_id = $id;
-           	//$file->origin_file = $origin_file;
-           //	$file->save();
-
+           // dd($origin_file);
 			$reorder = Reorder::where('user_id','=',Auth::id())
 								->where('listname','=',$request->listname)
 								->select('jsondata')->first();
@@ -194,9 +191,9 @@ class ImportController extends Controller
 
 			list($okey, $nkey) = array_divide($tmpdata);
 
-			//dd($tmpdata);
+			
 
-			//$heading = array_flip($tmpdata);
+			$heading = array_filter($nkey);
 
 			$firstrow = $data->first();
 
@@ -207,7 +204,7 @@ class ImportController extends Controller
 		return view ('/import/import_parse_list')
 				->with('heading',$tmpdata)
 				->with('firstrow',$firstrow)
-				->with('select',$select)
+				->with('select',$heading)
 				->with('data',$data)
 				->with('listname',$request->listname)
 				->with('origin_file',$origin_file);
@@ -243,32 +240,38 @@ class ImportController extends Controller
 
 		//return dd($data,$okey, $nkey,$jsondata);
 
-		$sourcedata = \Excel::load('storage/export/'.$origin_file)->all()->toArray();
+		$sourcedata = \Excel::load('storage/app/public/export/'.$origin_file)->all()->toArray();
+		//dd($sourcedata);
+		$addrow = array_diff_key($data,$sourcedata[0]);
+		$faddrow = array_flip($addrow);
+		//$gg = $addrow+array_flip($okey);
+		$newk = array_flip(array_filter($data));
 
-		\Storage::delete("/public/export/".$origin_file);
+		foreach ($newk as $oskey => $osvalue) {
+				$order[$oskey] = $osvalue ;
+			foreach ($addrow as $akey => $avalue) {
+					//dd($rvalue[$oskey] ,$akey);
+				if ($oskey == $akey) {
+					$order[$oskey] = $akey ;
+				}
+			}
+		}
+		
+		//還沒成功刪除(unfix)
+		\Storage::delete('app/public/export/'.$origin_file);
 
 		foreach ($sourcedata as $value) {
-			//dd($okey,$value);
-		  $tmpdata = array_merge(array_flip($okey),$value);
-
-		  list($okeys, $ovalue) = array_divide($tmpdata);
-
-		  //dd($nkey,$ovalue);
-
-		  $cdata = array_combine($nkey, $ovalue);
-
-		  $newk = array_filter($nkey);
-
-		  $exportdata[] = array_intersect_key($cdata,array_flip($newk));
-
-		  //$exportdata [] = array_splice($stmpdata, offset)
-
-		   //dd($okey,$value,$tmpdata,$nkey,$newk,$ovalue,$exportdata);
-
+		  $nvalue = $value+array_flip($addrow);
+		  foreach ($order as $rkey => $rvalue) {
+				$ready[$rkey] = $rvalue ;
+			foreach ($nvalue as $nkey => $value) {
+				if ($nkey == $rvalue) {
+					$ready[$rkey] = $value ;
+				}
+			}
+		  }
+		  $exportdata[] = $ready;
 		}
-
-		//return dd($exportdata);
-		//Storage::delete("/public/export/".$origin_file);
 
 		$exportname = str_random(40);
 

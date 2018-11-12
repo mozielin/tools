@@ -1,7 +1,7 @@
 @extends('layouts.main')
 @section('content')
-<script src="http://code.jquery.com/jquery-1.12.0.js"></script> 
-        <script src="http://code.jquery.com/ui/1.12.0/jquery-ui.js"></script> 
+<script src="https://code.jquery.com/jquery-1.12.0.js"></script> 
+        <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script> 
 
         <script> 
              $(function() { 
@@ -21,7 +21,7 @@
      <!-- BEGIN EXAMPLE TABLE PORTLET-->
     <form  method="POST" action="{{ route('import_process') }}">
         {{ csrf_field() }}
-        <div class="col-md-6">                           
+        <div class="col-md-8">                           
             <!-- BEGIN EXAMPLE TABLE PORTLET-->
         <script type="text/javascript">
             $('#form-submit').click(function(e){
@@ -41,7 +41,7 @@
                 <div class="portlet-title">
                     <div class="caption font-red">
                         <i class="icon-settings font-red"></i>
-                        <span class="caption-subject bold uppercase">Source Data</span>
+                        <span class="caption-subject bold uppercase">建立新轉換模板</span>
                     </div>
                 </div>
                 <div class="form-group form-md-line-input has-info form-md-floating-label">
@@ -51,7 +51,7 @@
                         </span>
                         @if($listname == null)
                         <input type="text" class="form-control" name="listname" value="">
-                        <label for="form_control_1">Templete Name</label>
+                        <label for="form_control_1">輸入轉檔模板名稱</label>
                         @else
                         <input type="text" class="form-control" name="listname" value="{{$listname}}" readonly>
                         
@@ -71,15 +71,17 @@
                     <table class="table table-striped table-checkable table-bordered table-hover" id='mytable'>    
                         <thead>
                             <tr>
-                                
-                                <td>
-                                    Heading
+                                <td class="col-md-1">
+                                    No.
                                 </td>
-                                <td>
-                                    Column
+                                <td class="col-md-3" style="text-align:center;">
+                                    來源檔案欄位名稱
                                 </td>
-                                <td>
-                                    Rename
+                                <td class="col-md-4" style="text-align:center;"> 
+                                    資料預覽
+                                </td>
+                                <td class="col-md-3" style="text-align:center;">
+                                    對應目標檔案欄位名稱
                                 </td>
                             </tr>
                         </thead>
@@ -87,25 +89,23 @@
                             @foreach($heading as $head => $hdata)
 
                                 <tr id={{$head}}>
-                                
                                     <td>
-                                        <input type="hidden" name="{{$hdata}}" value="" >
+                                        {{$head+1}}
+                                    </td>
+                                    <td style="text-align:center;">
                                         {{$hdata}}
                                     </td>
-                                    <td>   
-                                            {{$firstrow->$hdata}}
+                                    <td id="f{{$head}}" style="text-align:center;">
+                                    <input type="text" class=" col-md-4 form-control" name="manual[]" value="{{$firstrow->$hdata}}" >   
+                                       
                                             
                                     </td>
-                                    <td>
-                                            <select class="form-control" style="padding-left:20px;" name="{{$hdata}}" placeholder="Please Select">
-                                                <option value="" disabled selected>Select your option</option>
-                                                @foreach ($select as $skey =>$sdata)
-                                                	{{$skey}}{{$sdata}}
-                                                    @if($hdata == $sdata->header)
-                                                        <option value="{{$sdata->header}}" selected='true'>{{$head}}{{$skey}}{{$sdata->header}}</option>
-                                                    @else
-                                                        <option value="{{$sdata->header}}">{{$skey}}{{$sdata->header}}</option>
-                                                    @endif        
+                                    <td>    <input type="hidden" name="{{$hdata}}" value="null">
+                                            <select class="form-control" style="text-align:center;" name="{{$hdata}}" placeholder="Please Select" onchange="Linkfile(this)">
+                                                <option value="" disabled selected>無</option>
+                                                @foreach ($shead as $sdata)
+                                                <option value="{{$sdata}}" key="{{$firstrow->$sdata}}" link="{{$head}}">{{$sdata}}</option>
+
                                                 @endforeach
                                             </select>
                                     </td>
@@ -114,8 +114,8 @@
                             @endforeach
                         </tbody> 
                      </table>
-                     <div class="btn-group">
-                        <button id="sample_editable_1_new" class="btn green" onclick="CreateRow()"> Add New
+                    <div class="btn-group">
+                        <button id="sample_editable_1_new" class="btn green" onclick="CreateRow()"> 新增欄位
                             <i class="fa fa-plus"></i>
                         </button>
                     </div>  
@@ -138,14 +138,62 @@
 
         var boxes = document.getElementById("tt");
 		var clone = boxes.children[1].cloneNode(true);
-		console.log(rows);
-		clone.id = rows;
+		//console.log(rows);
+		clone.id = 'nrow_'+rows;
+        var rid = clone.id;
 		var firstd = clone.firstElementChild;
-		firstd.innerHTML = 'New_'+rows;
+		firstd.innerHTML = "<i class='fa fa-times btn' onclick='Removerow("+rid+")'></i>";
+        var secondd = clone.children[1];
+        secondd.innerHTML = "<input type='text'  id='I"+rows+"' value='' onchange='Setname("+rows+")' class='form-control' required>";
+        //name='"+rows+"'
 		var lastd = clone.lastElementChild;
-		lastd.lastElementChild.setAttribute('name',rows);
+		lastd.lastElementChild.setAttribute('link',rows);
+        lastd.lastElementChild.id = 's_'+rows;
+        lastd.lastElementChild.removeAttribute('onchange');
 		boxes.appendChild(clone);
+        //clone.appendChild("<i class='fa fa-times'><i/>");
 
+    }
+
+    function ChangeOpt(QQ){
+        var iname = QQ.getAttribute("link");
+        //console.log(iname);
+        var svalue = QQ.options[QQ.selectedIndex].value;
+
+        document.getElementById("I"+iname).setAttribute('name',svalue);
+
+
+        console.log(svalue);
+
+    }
+
+      function Linkfile(QQ){
+        var data = QQ.options[QQ.selectedIndex].getAttribute('key');
+        var link = QQ.options[QQ.selectedIndex].getAttribute('link');
+        //console.log(data);
+
+        //var svalue = QQ.options[QQ.selectedIndex].value;
+
+        document.getElementById("f"+link).innerHTML = data;
+
+        //console.log(svalue);
+
+    }
+
+    function Setname(sid){
+
+        //console.log(sid);
+
+        var ivalue = document.getElementById("I"+sid).value;
+        //console.log(ivalue);
+        document.getElementById("s_"+sid).setAttribute('name',ivalue);
+
+    }
+
+    function Removerow(rid){
+        console.log(rid);
+        rid.parentNode.removeChild(rid);
+        //console.log(rid);
     }
     
 </script>

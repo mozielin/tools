@@ -4,11 +4,12 @@
     <!-- BEGIN HEAD -->
 
     <head>
-        <title>Tools| ECFit</title>
+        <title>ECFIT Intertidal 雲端營運工具</title>
 
         @include('layouts.meta')
+        @section('css')
         @include('layouts.css')
-
+        @show
     </head>
     <!-- END HEAD -->
 
@@ -44,8 +45,12 @@
             </div>
             <!-- END FOOTER -->
         </div>
+        @section('script')
 
         @include('layouts.js')
+
+        @show
+      
 
         <script> 
              $(function() { 

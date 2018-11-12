@@ -35,14 +35,15 @@ class SocialAuthController extends Controller
 
         if (Auth::user()->password == null) {
         	//return view ( 'firstlogin' )->withDetails ( $user )->withService ( $service );
-        	return redirect()->action('SocialAuthController@firstlogin');
+        	return redirect($authUser)->action('SocialAuthController@firstlogin');
         }
         
-        return view ('view');
+        return redirect()->action('HomeController@index');
     }
 
-    public function firstlogin()
-    {
+    public function firstlogin($authUser)
+    {       
+        dd($authUser);
     	return view('firstlogin');
     }
 
@@ -50,6 +51,9 @@ class SocialAuthController extends Controller
     {	
     	//return dd($getUser,$getUser->avatar,$getUser->id);
         if ($authUser = User::where('email', $getUser->email)->first()) {
+            $authUser -> fb_id = $getUser->id;
+            $authUser -> fb_avatar = $getUser->avatar;
+            $authUser ->save();
             return $authUser;
         }
  
@@ -94,7 +98,7 @@ class SocialAuthController extends Controller
         $user -> password = bcrypt($request->password);
         $user -> save();
 
-        return view ( 'view' );
+        return view ( 'home' );
 
     }
 }

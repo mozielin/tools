@@ -4,7 +4,7 @@
     <div class="page-header-inner ">
         <!-- BEGIN LOGO -->
         <div class="page-logo">
-            <a href="index.html">
+            <a href="home">
                 <img src="../assets/layouts/layout/img/logo.png" alt="logo" class="logo-default" /> </a>
             <div class="menu-toggler sidebar-toggler">
                 <span></span>
@@ -321,14 +321,16 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-default">
                         <li>
-                            <a href="page_user_profile_1.html">
-                                <i class="icon-user"></i> My Profile </a>
+                            <a href="/user_view/{{Auth::id()}}">
+                                <i class="icon-user"></i> 帳號資訊 </a>
                         </li>
+                        @permission('Devenlope')
                         <li class="divider"> </li>
                         <li>
                             <a href="page_user_lock_1.html">
-                                <i class="icon-lock"></i> Lock Screen </a>
+                                <i class="icon-lock"></i> 螢幕鎖定 </a>
                         </li>
+                        @endpermission
                     </ul>
                 </li>
                 <!-- END USER LOGIN DROPDOWN -->
@@ -336,7 +338,7 @@
                 <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
                 <li class="dropdown dropdown-quick-sidebar-toggler">
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                            @csrf
+                            {{ csrf_field() }}
                             </form>
                              <a href="{{ route('logout') }}"
                                     onclick="event.preventDefault();

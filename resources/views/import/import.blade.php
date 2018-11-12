@@ -5,13 +5,28 @@
     <form id="import" action="/import/upload" class="form-horizontal form-bordered" method="POST" enctype="multipart/form-data">
         {{ csrf_field() }}
         <div class="form-group last">
-            <label class="control-label col-md-3">Source File</label>
+            <label class="control-label col-md-3">選擇欲轉換之「來源」格式檔案</label>
                 <div class="col-md-9">
                     <div class="fileinput fileinput-new" data-provides="fileinput">
                         <span class="btn green btn-file">
-                        <span class="fileinput-new"> Select file </span>
-                        <span class="fileinput-exists"> Change </span>
+                        <span class="fileinput-new"><i class="fa fa-file"></i> 選擇檔案 </span>
+                        <span class="fileinput-exists"> 更換 </span>
                         <input type="file" name="excel" accept=".xlsx" value="Upload" required> </span>
+                        <span class="fileinput-filename"> </span> &nbsp;
+                        <a href="javascript:;" class="close fileinput-exists" data-dismiss="fileinput"> </a>
+                    </div>
+                    
+                </div>
+        </div>
+
+        <div class="form-group last">
+            <label class="control-label col-md-3">選擇欲轉換之「目標」格式檔案</label>
+                <div class="col-md-9">
+                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                        <span class="btn green btn-file">
+                            <span class="fileinput-new"><i class="fa fa-file"></i> 選擇檔案 </span>
+                        <span class="fileinput-exists"> 更換 </span>
+                        <input type="file" name="sample" accept=".xlsx" value="Upload" required> </span>
                         <span class="fileinput-filename"> </span> &nbsp;
                         <a href="javascript:;" class="close fileinput-exists" data-dismiss="fileinput"> </a>
                     </div>
@@ -22,9 +37,9 @@
         <div class="form-actions">
             <div class="row">
                 <div class="col-md-offset-3 col-md-9">
-                    <a class="btn green" onclick='document.forms["import"].submit(); return false;'>
-                        <i class="fa fa-check"></i> Submit</a>
-                    <a href="javascript:;" class="btn btn-outline grey-salsa">Cancel</a>
+                    <a class="btn blue" onclick='document.forms["import"].submit(); return false;'>
+                        <i class="fa fa-check"></i> 進行下一步</a>
+                    <a href="javascript:;" class="btn btn-outline grey-salsa">取消</a>
                 </div>
             </div>
         </div>

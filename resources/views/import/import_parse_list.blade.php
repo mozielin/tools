@@ -100,11 +100,11 @@
                                             <select class="form-control" style="padding-left:20px;" name="{{$key}}" placeholder="Please Select">
                                                 <option value="" disabled selected>Select your option</option>
                                                 @foreach ($select as $option)
-                                                    @if($hdata == $option->header)
+                                                    @if($hdata == $option)
                                                         //如果迴圈符合預設選取
-                                                        <option value="{{$option->header}}" selected>{{$option->header}}</option>
+                                                        <option value="{{$option}}" selected>{{$option}}</option>
                                                     @else//如果不符合就跑一般選項
-                                                        <option value="{{$option->header}}">{{$option->header}}</option>
+                                                        <option value="{{$option}}">{{$option}}</option>
                                                     @endif        
                                                 @endforeach
                                             </select>

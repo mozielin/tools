@@ -29,4 +29,4 @@
         <script src="../assets/layouts/global/scripts/quick-sidebar.min.js" type="text/javascript"></script>
         <script src="../assets/layouts/global/scripts/quick-nav.min.js" type="text/javascript"></script>
         <!-- END THEME LAYOUT SCRIPTS -->
-        <script src="http://code.jquery.com/ui/1.12.0/jquery-ui.js"></script> 
+        <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script> 

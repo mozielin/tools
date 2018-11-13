@@ -89,23 +89,32 @@
                             @foreach($heading as $head => $hdata)
 
                                 <tr id={{$head}}>
-                                    <td>
+                                    <td> 
                                         {{$head+1}}
                                     </td>
-                                    <td style="text-align:center;">
-                                        {{$hdata}}
+                                    <td style="text-align:center; vertical-align: center;">
+                                        
+                                            <input type="text" style="text-align:center;" class=" col-md-4 form-control" value="{{$hdata}}" readonly>
+                                        
                                     </td>
-                                    <td id="f{{$head}}" style="text-align:center;">
-                                    <input type="text" class=" col-md-4 form-control" name="manual[]" value="{{$firstrow->$hdata}}" >   
+                                    <td >
+                                        <div class="form-group form-md-line-input has-info form-md-floating-label"  style="margin-bottom:0; padding-top:10;">
+                                            <div class="input-group left-addon">
+                                                <span class="input-group-addon">
+                                                </span>
+                                                <input type="text" class="form-control" id="t{{$head}}" name="target[{{$hdata}}]" value="" link="{{$head}}" onchange="Addrow(this)">
+                                                <label id="label{{$head}}" for="form_control_1">Input or from Select</label>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" id="l{{$head}}" name="lookup[{{$hdata}}]">
+                                        <input type="hidden" id="a{{$head}}" name="addrow[{{$hdata}}]">
                                        
-                                            
                                     </td>
-                                    <td>    <input type="hidden" name="{{$hdata}}" value="null">
-                                            <select class="form-control" style="text-align:center;" name="{{$hdata}}" placeholder="Please Select" onchange="Linkfile(this)">
+                                    <td>    
+                                            <select class="form-control" style="text-align:center;" link="{{$head}}"  placeholder="Please Select" onchange="Linkfile(this)">
                                                 <option value="" disabled selected>無</option>
                                                 @foreach ($shead as $sdata)
-                                                <option value="{{$sdata}}" key="{{$firstrow->$sdata}}" link="{{$head}}">{{$sdata}}</option>
-
+                                                <option value="{{$sdata}}" key="{{$firstrow->$sdata}}" >{{$sdata}}</option>
                                                 @endforeach
                                             </select>
                                     </td>
@@ -142,51 +151,71 @@
 		clone.id = 'nrow_'+rows;
         var rid = clone.id;
 		var firstd = clone.firstElementChild;
-		firstd.innerHTML = "<i class='fa fa-times btn' onclick='Removerow("+rid+")'></i>";
+        firstd.innerHTML = "<i class='fa fa-times btn' onclick='Removerow("+rid+")'></i>";
+
         var secondd = clone.children[1];
-        secondd.innerHTML = "<input type='text'  id='I"+rows+"' value='' onchange='Setname("+rows+")' class='form-control' required>";
-        //name='"+rows+"'
+        secondd.firstElementChild.id = 'I'+rows;
+        secondd.firstElementChild.removeAttribute('readonly');
+        secondd.firstElementChild.setAttribute('value','');
+        secondd.firstElementChild.setAttribute('placeholder','新增欄位名稱');
+        secondd.firstElementChild.setAttribute('onchange',"Setrow("+rows+")");
+
+        var third = clone.children[2];
+        third.children[0].children[0].children[1].setAttribute('link',rows);
+        third.children[0].children[0].children[1].id = 't'+rows;
+        third.children[0].children[0].children[1].removeAttribute('disabled');
+        third.children[0].children[0].children[2].id = 'label'+rows;
+        third.children[0].children[0].children[2].innerHTML = "Input or from Select";
+        third.children[1].id = 'l'+rows;
+        third.children[2].id = 'a'+rows;
+        
+
+       
 		var lastd = clone.lastElementChild;
 		lastd.lastElementChild.setAttribute('link',rows);
         lastd.lastElementChild.id = 's_'+rows;
-        lastd.lastElementChild.removeAttribute('onchange');
+        //lastd.lastElementChild.removeAttribute('onchange');
 		boxes.appendChild(clone);
         //clone.appendChild("<i class='fa fa-times'><i/>");
-
+         //secondd.innerHTML = "<input type='text'  id='I"+rows+"' value='' onchange='Setrow("+rows+")' class='form-control' required>";
+        //third.innerHTML = "<input type='text' class='form-control' id='t"+rows+"' link='"+rows+"' name='target[]' onchange='Addrow(this)' value=''><input type='hidden' id='l"+rows+"' name='lookup[]' value=''><input type='hidden' id='a"+rows+"' name='addrow[]' value=''>";
     }
 
-    function ChangeOpt(QQ){
-        var iname = QQ.getAttribute("link");
-        //console.log(iname);
-        var svalue = QQ.options[QQ.selectedIndex].value;
-
-        document.getElementById("I"+iname).setAttribute('name',svalue);
-
-
-        console.log(svalue);
+    function Addrow(IN){
+        var ivalue = IN.value;
+        var link = IN.getAttribute('link');
+        document.getElementById("a"+link).setAttribute('value',ivalue);
 
     }
 
       function Linkfile(QQ){
         var data = QQ.options[QQ.selectedIndex].getAttribute('key');
-        var link = QQ.options[QQ.selectedIndex].getAttribute('link');
-        //console.log(data);
+        var svalue = QQ.options[QQ.selectedIndex].value;
+        var link = QQ.getAttribute('link');
+        var value = QQ.value;
 
-        //var svalue = QQ.options[QQ.selectedIndex].value;
+        document.getElementById("t"+link).setAttribute("disabled",true);
 
-        document.getElementById("f"+link).innerHTML = data;
+        document.getElementById("l"+link).setAttribute('value',svalue);
 
-        //console.log(svalue);
+        //document.getElementById("a"+link).setAttribute('value',data);
+
+        document.getElementById("label"+link).innerHTML = data;
+
+        console.log(value,data);
 
     }
 
-    function Setname(sid){
+    function Setrow(sid){
 
         //console.log(sid);
 
         var ivalue = document.getElementById("I"+sid).value;
         //console.log(ivalue);
-        document.getElementById("s_"+sid).setAttribute('name',ivalue);
+        document.getElementById("l"+sid).setAttribute('name','lookup['+ivalue+']');
+        document.getElementById("a"+sid).setAttribute('name','addrow['+ivalue+']');
+        //document.getElementById("a"+sid).setAttribute('value',ivalue);
+
 
     }
 

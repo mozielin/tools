@@ -113,13 +113,14 @@ class ImportController extends Controller
         }
  		
 		$sourcedata = \Excel::load('storage/app/public/export/'.$origin_file)->all()->toArray();
-
-		$addrow = array_diff_key($data,$sourcedata[0]);
-		dd($data,$okey, $nkey,$sourcedata[0],$addrow);
-		$faddrow = array_flip($addrow);
+		//還沒成功刪除(unfix)
+		\Storage::delete('app/public/export/'.$origin_file);
+		//$addrow = array_diff_key($data,$sourcedata[0]);
+		//dd($data,$okey, $nkey,$sourcedata[0],$addrow);
+		//$faddrow = array_flip($addrow);
 		
 		//$newk = array_flip($data);
-	//dd($data,$addrow,$newk);
+	/*dd($data,$addrow,$newk);
 		foreach ($data as $oskey => $osvalue) {
 				$order[$oskey] = $osvalue ;
 			foreach ($addrow as $akey => $avalue) {
@@ -129,25 +130,31 @@ class ImportController extends Controller
 				}
 			}
 		}
-		dd($data,$addrow,$order);
-		//還沒成功刪除(unfix)
-		\Storage::delete('app/public/export/'.$origin_file);
+		dd($data,$addrow,$order);*/
+		$lookup = $data['lookup'];
+		$addrow = array_filter($data['addrow']);
 
-		foreach ($sourcedata as $value) {
-		  $nvalue = $value+array_flip($addrow);
-		 
-		  foreach ($order as $rkey => $rvalue) {
-				$ready[$rvalue] = $rvalue ;
-			foreach ($nvalue as $nkey => $value) {
-				if ($nkey == $rkey) {
-					$ready[$rvalue] = $value ;
+
+		
+		//dd($sourcedata,$lookup,$addrow);
+
+		foreach ($sourcedata as $svalue) {
+  			foreach ($lookup as $lkey => $lvalue) {
+  				$result[$lkey] = $lvalue;
+  				foreach ($svalue as $skey => $ssvalue) {
+					if ($skey == $lvalue) {
+						$result[$lkey] = $ssvalue ;
+					}
 				}
-			}
-		  }
-		  $exportdata[] = $ready;
+				foreach ($addrow as $akey => $avalue) {
+					if($akey == $lkey)
+						$result[$lkey] = $avalue ;
+				}
+		  	}
+		  	$exportdata[] = $result;
 		}
-		 dd($nvalue,$order,$exportdata);
-
+		
+		//dd($exportdata);
 		$exportname = str_random(40);
 
     	\Excel::create($exportname, function($excel)use($exportdata) {
@@ -189,23 +196,26 @@ class ImportController extends Controller
 								
 			$tmpdata = json_decode($reorder->jsondata,true);
 
-			list($okey, $nkey) = array_divide($tmpdata);
+			//dd(array_filter($tmpdata['lookup']));
 
-			
+			//list($heading, $shead) = array_divide($tmpdata['lookup']);
 
-			$heading = array_filter($nkey);
+			$shead = array_filter($tmpdata['lookup']);
 
 			$firstrow = $data->first();
-
-			//$heading = $data->getHeading();
+			$count = 0;
+			$addrow = $tmpdata['addrow'];
+			$heading = $tmpdata['lookup'];
 			//$tmpdata = array_merge(array_flip($okey),$value);
-		//	dd($firstrow);
-		
+			//dd($tmpdata,$heading,$addrow,$firstrow, $shead);
+
 		return view ('/import/import_parse_list')
-				->with('heading',$tmpdata)
+				->with('tmpdata',$tmpdata)
+				->with('heading',$heading)
 				->with('firstrow',$firstrow)
-				->with('select',$heading)
-				->with('data',$data)
+				->with('shead',$shead)
+				->with('count',$count)
+				->with('addrow',$addrow)
 				->with('listname',$request->listname)
 				->with('origin_file',$origin_file);
 			

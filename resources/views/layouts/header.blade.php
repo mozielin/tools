@@ -4,7 +4,7 @@
     <div class="page-header-inner ">
         <!-- BEGIN LOGO -->
         <div class="page-logo">
-            <a href="home">
+            <a href="{{route('home')}}">
                 <img src="../assets/layouts/layout/img/logo.png" alt="logo" class="logo-default" /> </a>
             <div class="menu-toggler sidebar-toggler">
                 <span></span>
@@ -321,7 +321,7 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-default">
                         <li>
-                            <a href="/user_view/{{Auth::id()}}">
+                            <a href="{{route('user_view',Auth::id())}}">
                                 <i class="icon-user"></i> 帳號資訊 </a>
                         </li>
                         @permission('Devenlope')

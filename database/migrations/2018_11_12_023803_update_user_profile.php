@@ -17,7 +17,9 @@ class UpdateUserProfile extends Migration
             $table->string('phone')->nullable()->unique();
             $table->string('realname')->nullable();
             $table->string('company')->nullable();
+            $table->string('note')->nullable();
             $table->integer('c_id')->nullable();
+            $table->integer('p_id')->nullable();
         });
     }
 
@@ -32,7 +34,9 @@ class UpdateUserProfile extends Migration
             $table->dropColumn('phone');
             $table->dropColumn('realname');
             $table->dropColumn('company');
+            $table->dropColumn('note');
             $table->dropColumn('c_id');
+            $table->dropColumn('p_id');
         });
     }
 }

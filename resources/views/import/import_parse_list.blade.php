@@ -41,7 +41,7 @@
                 <div class="portlet-title">
                     <div class="caption font-red">
                         <i class="icon-settings font-red"></i>
-                        <span class="caption-subject bold uppercase">建立新轉換模板</span>
+                        <span class="caption-subject bold uppercase">從模板轉換</span>
                     </div>
                 </div>
                 <div class="form-group form-md-line-input has-info form-md-floating-label">
@@ -50,11 +50,10 @@
                             <i class="fa fa-file-excel-o"></i>
                         </span>
                         @if($listname == null)
-                        <input type="text" class="form-control" name="listname" value="">
+                        <input type="text" class="form-control" name="listname" value="" required>
                         <label for="form_control_1">輸入轉檔模板名稱</label>
                         @else
-                        <input type="text" class="form-control" name="listname" value="{{$listname}}" readonly>
-                        
+                        <input type="text" class="form-control" name="listname" value="{{$listname}}" readonly required>
                         @endif
                         <span class="input-group-btn btn-right">
                             <button type="text" class="btn red mt-ladda-btn ladda-button btn-circle btn-outline" id="form-submit" data-style="slide-right" data-spinner-color="#333">
@@ -75,20 +74,20 @@
                                     No.
                                 </td>
                                 <td class="col-md-3" style="text-align:center;">
-                                    來源檔案欄位名稱
+                                    目標檔案欄位名稱
                                 </td>
                                 <td class="col-md-4" style="text-align:center;"> 
-                                    資料預覽
+                                    來源資料預覽或輸入預設值
                                 </td>
                                 <td class="col-md-3" style="text-align:center;">
-                                    對應目標檔案欄位名稱
+                                    對應來源檔案欄位名稱
                                 </td>
                             </tr>
                         </thead>
                         <tbody id="tt"> 
                             @foreach($tmpdata['lookup'] as $head => $hdata)
 
-                                <tr id={{$count++}}>
+                                <tr id={{$count}}>
                                     <td> 
                                         {{$count++}}
                                     </td>
@@ -103,11 +102,17 @@
                                                 <span class="input-group-addon">
                                                 </span>
                                                 <input type="text" class="form-control" id="t{{$head}}" name="target[{{$hdata}}]" value="" link="{{$head}}" onchange="Addrow(this)">
-                                                @if($firstrow->$hdata)
-                                                <label id="label{{$head}}" for="form_control_1">{{$firstrow->$hdata}}</label>
-                                                @else
-                                                <label id="label{{$head}}" for="form_control_1">未使用此欄位</label>
-                                                @endif
+                                                <label id="label{{$head}}" for="form_control_1">
+                                                    
+                                                    @if($firstrow->$hdata)
+                                                        {{$firstrow->$hdata}}
+                                                    @elseif(isset($addrow[$head]))
+                                                        {{$addrow[$head]}}
+                                                    @else
+                                                        未使用此欄位
+                                                    @endif
+                                                  
+                                                </label>
                                             </div>
                                         </div>
                                         <input type="hidden" id="l{{$head}}" name="lookup[{{$head}}]" value="{{$hdata}}">
@@ -119,16 +124,18 @@
                                     </td>
                                     <td>    
                                         <select class="form-control" style="text-align:center;" link="{{$head}}"  placeholder="Please Select" onchange="Linkfile(this)">
+                                            <option value="" selected>無</option>
                                             @foreach ($firstrow as $fkey => $fdata)
-                                                @foreach($shead as $skey => $sdata)
-                                                    @if($skey == $head)
+                                                 
+                                                    @if($fkey == $hdata)
                                                         <option value="{{$fkey}}" key="{{$fdata}}" selected >{{$fkey}}</option>
-                                                        @break
+                                                        
                                                     @else
+
                                                         <option value="{{$fkey}}" key="{{$fdata}}">{{$fkey}}</option>
-                                                        @break
+                                                        
                                                     @endif
-                                                @endforeach
+                                             
                                             @endforeach
                                         </select>
                                     </td>
@@ -141,13 +148,54 @@
                         <button id="sample_editable_1_new" class="btn green" onclick="CreateRow()"> 新增欄位
                             <i class="fa fa-plus"></i>
                         </button>
+                    </div>
+                    <div id="pageTop" style="cursor:pointer;z-index:99;float: right;">
+                        <button type="button" class="btn blue mt-ladda-btn ladda-button btn-circle btn-outline" data-style="slide-up" data-spinner-color="#333">
+                        <span class="ladda-label">
+                            <i class="fa fa-chevron-up"></i> 回到頂端 </span>
+                        <span class="ladda-spinner"></span></button>
                     </div>  
                 </div>
             </div>
         </div>    
     </form>             <!-- END EXAMPLE TABLE PORTLET-->
+    <div class="col-md-4">
+        <div class="portlet light bordered">
+            <div class="portlet-title">
+                <div class="caption font-green">
+                    <i class="fa fa-info-circle font-green"></i>
+                    <span class="caption-subject bold uppercase">使用說明</span>
+                </div>
+            </div>
+        
+        <table class="table table-striped table-checkable table-bordered table-hover" id='manuel'>
+            <thead>
+                <tr>
+                    <td class="col-md-1">
+                        No.
+                    </td>
+                    <td class="col-md-3" style="text-align:center;">
+                        目標檔案欄位名稱
+                    </td>
+                    <td class="col-md-4" style="text-align:center;"> 
+                        來源資料預覽或輸入預設值
+                    </td>
+                    <td class="col-md-3" style="text-align:center;">
+                        對應來源檔案欄位名稱
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        123456
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
 </div>     
-
 
 <script>
     function CreateRow() {
@@ -176,18 +224,22 @@
 
         var third = clone.children[2];
         third.children[0].children[0].children[1].setAttribute('link',rows);
+        third.children[0].children[0].children[1].value = "";
         third.children[0].children[0].children[1].id = 't'+rows;
         third.children[0].children[0].children[1].removeAttribute('disabled');
         third.children[0].children[0].children[2].id = 'label'+rows;
         third.children[0].children[0].children[2].innerHTML = "Input or from Select";
         third.children[1].id = 'l'+rows;
+        third.children[1].value = "";
         third.children[2].id = 'a'+rows;
-        
+        third.children[2].value = "";
 
        
 		var lastd = clone.lastElementChild;
 		lastd.lastElementChild.setAttribute('link',rows);
         lastd.lastElementChild.id = 's_'+rows;
+        console.log(lastd.lastElementChild.options);
+        lastd.lastElementChild.options.selectedIndex  = 0;
         //lastd.lastElementChild.removeAttribute('onchange');
 		boxes.appendChild(clone);
         //clone.appendChild("<i class='fa fa-times'><i/>");
@@ -198,26 +250,20 @@
     function Addrow(IN){
         var ivalue = IN.value;
         var link = IN.getAttribute('link');
-        document.getElementById("a"+link).setAttribute('value',ivalue);
-
+        document.getElementById("a"+link).value = ivalue;
+        document.getElementById("l"+link).value = "";
     }
 
-      function Linkfile(QQ){
+    function Linkfile(QQ){
         var data = QQ.options[QQ.selectedIndex].getAttribute('key');
         var svalue = QQ.options[QQ.selectedIndex].value;
         var link = QQ.getAttribute('link');
         var value = QQ.value;
 
-        document.getElementById("t"+link).setAttribute("disabled",true);
-
-        document.getElementById("l"+link).setAttribute('value',svalue);
-
-        //document.getElementById("a"+link).setAttribute('value',data);
-
+        document.getElementById("a"+link).value = "";
+        document.getElementById("l"+link).value = svalue;
         document.getElementById("label"+link).innerHTML = data;
-
         console.log(value,data);
-
     }
 
     function Setrow(sid){
@@ -238,6 +284,13 @@
         rid.parentNode.removeChild(rid);
         //console.log(rid);
     }
+
+     $("#pageTop").click(function () {
+        jQuery("html,body").animate({
+            scrollTop: 0
+        }, 300);
+        
+    });
     
 </script>
 

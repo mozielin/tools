@@ -45,7 +45,12 @@ Route::get('/import_download/{filepath}/{listname}', 'ImportController@Download'
 
 Route::get('/import_list', 'ImportController@Importfromlist')->name('import_list');
 
+Route::get('/import_edit', 'ImportController@EditView')->name('import_edit');
+
+Route::get('/import_delete/{id}', 'ImportController@Delete')->name('import_delete');
+
 Route::get('/user_view/{user_id}', 'UserController@view')->name('user_view');
+
 
 //若要驗證加入,'middleware' => ['role:Admin']
 Route::group(['prefix'=>'user'], function(){
@@ -55,7 +60,7 @@ Route::group(['prefix'=>'user'], function(){
       Route::get('bygroup/{order}','UserController@bygroup')->name('user_bygroup');
       Route::get('byrole/{order}','UserController@byrole')->name('user_byrole');
       Route::get('bylogin/{order}','UserController@bylogin')->name('user_bylogin');
-      Route::get('view/{user_id}', 'UserController@view')->name('user_view');
+      //Route::get('view/{user_id}', 'UserController@view')->name('user_view');
       Route::get('create',['middleware' => ['permission:user_create'], 'uses' => 'UserController@create'])->name('user_create');
       Route::post('store',['middleware' => ['permission:user_create'], 'uses' => 'UserController@store'])->name('user_store');
       Route::get('edit/{user_id}',['middleware' => ['permission:user_edit'], 'uses' => 'UserController@edit'])->name('user_edit');

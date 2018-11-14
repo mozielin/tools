@@ -7,7 +7,7 @@
             {{ csrf_field() }}
             <div id="tx">
             <h2>If download is not start please click 
-            <button type="button" class="btn btn-primary" id="ck" onclick="location.href='{{route('import_download',[$filepath,$listname])}}'">
+            <button type="button" class="btn btn-primary" id="ck" onclick="location.href='{{route('import_download',[$filepath,$listname.'.xlsx'])}}'">
                 <i class="glyphicon glyphicon-pencil"></i>
                 Download
             </button>

@@ -8,7 +8,12 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
 
-use App\User,App\Select,App\Upload,App\Reorder;
+use Carbon\Carbon;
+
+use App\User,
+	App\Select,
+	App\Upload,
+	App\Reorder;
 
 
 
@@ -70,11 +75,12 @@ class ImportController extends Controller
            	
 
 			$firstrow = $data->first();
-			$heading = $sample->getHeading();
+			$filsample = $sample->getHeading();
+			$heading = array_filter($filsample);
 			$shead =  $data->getHeading();
 			$listname = null;
 
-			//return dd($tmpname,$data,$heading,$firstrow);
+			//return dd($tmpname,$data,$sample,$heading,$firstrow);
 		
 		return view ('/import/import_parse')
 				->with('heading',$heading)
@@ -90,54 +96,36 @@ class ImportController extends Controller
 
     public function ProcessImport(Request $request)
     {
-   		//return dd($request);
+   		//取模板名稱跟原始檔案
     	$listname = $request->listname;
     	$origin_file = $request->origin_file;
-
+    	//去掉多餘
     	$data = $request->except('_token','exportname','origin_file','filename','listname');
 		list($okey, $nkey) = array_divide($data);
-
+		//轉成json存資料庫
 		$jsondata = json_encode($data);
-
 		if($request->listname != null){  
             $savedata = Reorder::firstOrCreate(
                 ['listname' => $request->listname,'user_id' => Auth::id()],
                 ['jsondata' => $jsondata,]
             );
-            //return dd($data);
             $savedata -> listname = $request->listname;
 			$savedata -> jsondata = $jsondata;
 			$savedata -> user_id = Auth::id();
-
 			$savedata ->save();
         }
- 		
+ 		//讀取來源檔轉array
 		$sourcedata = \Excel::load('storage/app/public/export/'.$origin_file)->all()->toArray();
-		//還沒成功刪除(unfix)
-		\Storage::delete('app/public/export/'.$origin_file);
-		//$addrow = array_diff_key($data,$sourcedata[0]);
-		//dd($data,$okey, $nkey,$sourcedata[0],$addrow);
-		//$faddrow = array_flip($addrow);
-		
-		//$newk = array_flip($data);
-	/*dd($data,$addrow,$newk);
-		foreach ($data as $oskey => $osvalue) {
-				$order[$oskey] = $osvalue ;
-			foreach ($addrow as $akey => $avalue) {
-					//dd($rvalue[$oskey] ,$akey);
-				if ($oskey == $akey) {
-					$order[$oskey] = $akey ;
-				}
-			}
-		}
-		dd($data,$addrow,$order);*/
+		//刪除上傳檔案(fix)先看路徑dd(Storage::path($origin_file));
+		Storage::delete('public/export/'.$origin_file);
+		//分拆array
 		$lookup = $data['lookup'];
 		$addrow = array_filter($data['addrow']);
-
-
-		
-		//dd($sourcedata,$lookup,$addrow);
-
+		//1.先把來源檔資料run一遍
+		//2.把目標標頭run一遍(會依此為輸出標頭)
+		//3.跑一圈有選取對照的，比較是否有選取(若有放進值)
+		//4.跑一圈有新增標頭的，比較後放值
+		//5.將結果存成2維
 		foreach ($sourcedata as $svalue) {
   			foreach ($lookup as $lkey => $lvalue) {
   				$result[$lkey] = $lvalue;
@@ -153,21 +141,19 @@ class ImportController extends Controller
 		  	}
 		  	$exportdata[] = $result;
 		}
-		
-		//dd($exportdata);
+		//取亂數檔名暫放
 		$exportname = str_random(40);
-
+		//存檔
     	\Excel::create($exportname, function($excel)use($exportdata) {
 	    	$excel->sheet('sheet', function($sheet)use($exportdata) {
 	        $sheet->fromArray($exportdata);
 	    	})->store('xlsx',storage_path('/app/public/export'));
 	    	
 	    });
-
+    	
   		return view('/import/start_download')
   				->with('listname',$listname)
   				->with('filepath',$exportname);
-            //return $this->Download($listname,$exportname);
     }
 
     public function Upload_list(Request $request)
@@ -207,7 +193,7 @@ class ImportController extends Controller
 			$addrow = $tmpdata['addrow'];
 			$heading = $tmpdata['lookup'];
 			//$tmpdata = array_merge(array_flip($okey),$value);
-			//dd($tmpdata,$heading,$addrow,$firstrow, $shead);
+			//dd($tmpdata,$heading,$addrow,$tmpdata['addrow'],$firstrow, $shead);
 
 		return view ('/import/import_parse_list')
 				->with('tmpdata',$tmpdata)
@@ -227,14 +213,11 @@ class ImportController extends Controller
    		//return dd($request);
     	$listname = $request->listname;
     	$origin_file = $request->origin_file;
-
     	$data = $request->except('_token','exportname','origin_file','filename','listname');
 		list($okey, $nkey) = array_divide($data);
 
 		$jsondata = json_encode($data);
-
 		//dd($jsondata);
-
 		 if($request->listname != null){  
             $savedata = Reorder::firstOrCreate(
                 ['listname' => $request->listname,'user_id' => Auth::id()],
@@ -267,8 +250,9 @@ class ImportController extends Controller
 			}
 		}
 		
+		return dd($origin_file); 
 		//還沒成功刪除(unfix)
-		\Storage::delete('app/public/export/'.$origin_file);
+		\Storage::delete('/storage/export/app/'.$origin_file);
 
 		foreach ($sourcedata as $value) {
 		  $nvalue = $value+array_flip($addrow);
@@ -285,35 +269,33 @@ class ImportController extends Controller
 
 		$exportname = str_random(40);
 
-		//\Session::flash(Auth::user()->email, $exportname);
-
     	\Excel::create($exportname, function($excel)use($exportdata) {
 	    	$excel->sheet('sheet', function($sheet)use($exportdata) {
 	        $sheet->fromArray($exportdata);
 	    	})->store('xlsx',storage_path('/app/public/export'));
 	    	
 	    });
-
-	   
-
-	   // return redirect()->action('ImportController@Download');
-		//$filepath = 'storage/export/'.$exportname;
 		
-		//dd($filepath);
   		return view('/import/start_download')
   				->with('listname',$listname)
   				->with('filepath',$exportname);
-            //return $this->Download($listname,$exportname);
-
     }
 
     public function Download($filepath,$listname){
+    	$time = Carbon::now()->toDateString(); 
+    	$path = 'storage/app/public/export/'.$filepath.'.xlsx';
+    	return \Response::download($path,$listname.'_'.$time.'.xlsx')->deleteFileAfterSend(true);
+    }
 
-    	//dd($filepath,$listname);
-
-    	$path = 'storage/export/'.$filepath.'.xlsx';
-
-    	return \Response::download($path,$listname.'.xlsx')->deleteFileAfterSend(true);
+    public function EditView(){
+    	$list = Reorder::where('user_id','=',Auth::id())->get(); 
+    	return view('import/import_edit')->with('list',$list);
     }
     
+    public function Delete($id){
+    	$delete = Reorder::find($id)->delete();
+
+    	$list = Reorder::where('user_id','=',Auth::id())->get();
+    	return redirect()->action('ImportController@EditView'); 
+    }
 }

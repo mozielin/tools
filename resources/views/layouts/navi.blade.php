@@ -53,17 +53,25 @@
         </li>
         <li class="nav-item  ">
             <a href="{{ route('import') }}" class="nav-link nav-toggle">
-                <i class="icon-paper-plane"></i>
+                <i class="fa fa-wrench"></i>
                 <span class="title">建立新轉換模板</span>
                 <span class="plus"></span>
             </a>
         </li>
         <li class="nav-item  ">
             <a href="{{ route('import_list') }}" class="nav-link nav-toggle">
-                <i class="icon-diamond"></i>
+                <i class="fa fa-bolt"></i>
                 <span class="title">執行檔案轉換</span>
                 <span class="plus"></span>
             </a>
+        </li>
+        <li class="nav-item  ">
+            <a href="{{ route('import_edit') }}" class="nav-link nav-toggle">
+                <i class="fa fa-folder-open-o"></i>
+                <span class="title">模板管理</span>
+                <span class="plus"></span>
+            </a>
+        </li>
             @permission('Devenlope')
             <ul class="sub-menu">
                 <li class="nav-item  ">
@@ -83,7 +91,7 @@
                 </li>
             </ul>
             @endpermission
-        </li>
+
         @role('devenlope')
         <li class="nav-item  ">
             <a href="{{ route('role_index') }}" class="nav-link nav-toggle">

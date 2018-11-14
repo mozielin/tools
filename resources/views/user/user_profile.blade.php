@@ -2,10 +2,10 @@
  <!-- BEGIN PAGE LEVEL PLUGINS -->
 @section('css')
 @parent
-    <link href="../assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet" type="text/css" />
     <!-- END PAGE LEVEL PLUGINS -->
     <!-- BEGIN PAGE LEVEL STYLES -->
-    <link href="../assets/pages/css/profile.min.css" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('/assets/pages/css/profile.min.css') }}" rel="stylesheet" type="text/css" />
     <!-- END PAGE LEVEL STYLES -->
 @endsection
         
@@ -114,9 +114,11 @@
                                 <li class="active">
                                     <a href="#tab_1_1" data-toggle="tab">Personal Info</a>
                                 </li>
+                                @role('devenlope')
                                 <li>
                                     <a href="#tab_1_2" data-toggle="tab">Change Avatar</a>
                                 </li>
+                                @endrole
                                 <li>
                                     <a href="#tab_1_3" data-toggle="tab">Change Password</a>
                                 </li>
@@ -131,27 +133,14 @@
                                 <div class="tab-pane active" id="tab_1_1">
                                     <form role="form" action="#">
                                         <div class="form-group">
-                                            <label class="control-label">First Name</label>
+                                            <label class="control-label">User Name</label>
                                             <input type="text" placeholder="{{$user->name}}" class="form-control" /> </div>
                                         <div class="form-group">
-                                            <label class="control-label">Last Name</label>
-                                            <input type="text" placeholder="Doe" class="form-control" /> </div>
+                                            <label class="control-label">Company</label>
+                                            <input type="text" placeholder="{{$user->company}}" class="form-control" /> </div>
                                         <div class="form-group">
                                             <label class="control-label">Mobile Number</label>
-                                            <input type="text" placeholder="+1 646 580 DEMO (6284)" class="form-control" /> </div>
-                                        <div class="form-group">
-                                            <label class="control-label">Interests</label>
-                                            <input type="text" placeholder="Design, Web etc." class="form-control" /> </div>
-                                        <div class="form-group">
-                                            <label class="control-label">Occupation</label>
-                                            <input type="text" placeholder="Web Developer" class="form-control" /> </div>
-                                        <div class="form-group">
-                                            <label class="control-label">About</label>
-                                            <textarea class="form-control" rows="3" placeholder="We are KeenThemes!!!"></textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="control-label">Website Url</label>
-                                            <input type="text" placeholder="http://www.mywebsite.com" class="form-control" /> </div>
+                                            <input type="text" placeholder="{{$user->phone}}" class="form-control" /> </div>
                                         <div class="margiv-top-10">
                                             <a href="javascript:;" class="btn green"> Save Changes </a>
                                             <a href="javascript:;" class="btn default"> Cancel </a>
@@ -159,6 +148,7 @@
                                     </form>
                                 </div>
                                 <!-- END PERSONAL INFO TAB -->
+                                @role('devenlope') 
                                 <!-- CHANGE AVATAR TAB -->
                                 <div class="tab-pane" id="tab_1_2">
                                     <p> Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum
@@ -189,18 +179,17 @@
                                     </form>
                                 </div>
                                 <!-- END CHANGE AVATAR TAB -->
+                                @endrole
                                 <!-- CHANGE PASSWORD TAB -->
                                 <div class="tab-pane" id="tab_1_3">
-                                    <form action="#">
-                                        <div class="form-group">
-                                            <label class="control-label">Current Password</label>
-                                            <input type="password" class="form-control" /> </div>
+                                    <form method="POST" action="{{ route('user_resetpwd',$user->id) }}">
+                                        {{ csrf_field() }}
                                         <div class="form-group">
                                             <label class="control-label">New Password</label>
-                                            <input type="password" class="form-control" /> </div>
+                                            <input id="password" type="password" class="form-control" name="password" required /> </div>
                                         <div class="form-group">
                                             <label class="control-label">Re-type New Password</label>
-                                            <input type="password" class="form-control" /> </div>
+                                            <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required /> </div>
                                         <div class="margin-top-10">
                                             <a href="javascript:;" class="btn green"> Change Password </a>
                                             <a href="javascript:;" class="btn default"> Cancel </a>
@@ -297,10 +286,11 @@
 @section('script')
 @parent
     <!-- BEGIN PAGE LEVEL PLUGINS -->
-    <script src="../assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
-    <script src="../assets/global/plugins/jquery.sparkline.min.js" type="text/javascript"></script>
+    <script src="{{ asset('/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('/assets/global/plugins/jquery.sparkline.min.js') }}" type="text/javascript"></script>
     <!-- END PAGE LEVEL PLUGINS -->
     <!-- BEGIN PAGE LEVEL SCRIPTS -->
-    <script src="../assets/pages/scripts/profile.min.js" type="text/javascript"></script>
+    <script src="{{ asset('/assets/pages/scripts/profile.min.js') }}" type="text/javascript"></script>
     <!-- END PAGE LEVEL SCRIPTS -->
+
 @endsection

@@ -6,6 +6,9 @@
             <i class="fa fa-files-o font-blue"></i>
             <span class="caption-subject bold uppercase">透過模板轉換</span>
         </div>
+        @if (session('error'))
+            <div class="alert alert-danger" style="text-align: center;">{{ session('error') }}</div>
+        @endif
     </div>
     <div class="portlet-body form">
         <!-- BEGIN FORM-->

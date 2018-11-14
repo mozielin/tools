@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 
 use Carbon\Carbon;
 
+use Exception;
+
 use App\User,
 	App\Select,
 	App\Upload,
@@ -51,34 +53,38 @@ class ImportController extends Controller
 
     public function Upload(Request $request)
 	{	
-
+		
 		//return dd($request);
 		if ($request->hasFile('excel')){
+
+			try {
 
 			$select = Select::all();
 
 			$tmpname = $request->excel->getPathName();
 			$tmpsname = $request->sample->getPathName();
-
+		
 			$data = \Excel::load($tmpname)->all();
-			$sample = \Excel::load($tmpsname)->all(); 
+			$sample = \Excel::load($tmpsname)->all();  	
 
 			$id = Auth::id();
-
-
 
 			//附件檔名儲存
             $filename = $request->excel->getClientOriginalName();
             $store = $request->file('excel')->store('public/export');  
             //dd($store);
             $getorigin = sscanf($store,'public/export/%s',$origin_file);
-           	
-
+ 
 			$firstrow = $data->first();
 			$filsample = $sample->getHeading();
 			$heading = array_filter($filsample);
 			$shead =  $data->getHeading();
 			$listname = null;
+
+			} catch (Exception $exception) {
+			
+			 	return back()->withError('上傳檔案內容格式不正確，請重新上傳!'.$exception->getMessage())->withInput();
+			} 
 
 			//return dd($tmpname,$data,$sample,$heading,$firstrow);
 		
@@ -158,12 +164,13 @@ class ImportController extends Controller
 
     public function Upload_list(Request $request)
 	{	
-
 		//return dd($request);
+	
 
 		if ($request->hasFile('excel')){
 
 			//$select = Select::all();
+			try {
 
 			$tmpname = $request->excel->getPathName();
 
@@ -194,6 +201,10 @@ class ImportController extends Controller
 			$heading = $tmpdata['lookup'];
 			//$tmpdata = array_merge(array_flip($okey),$value);
 			//dd($tmpdata,$heading,$addrow,$tmpdata['addrow'],$firstrow, $shead);
+			} catch (Exception $exception) {
+				
+				 return back()->withError('上傳檔案內容格式不正確，請重新上傳!'.$exception->getMessage())->withInput();
+			} 
 
 		return view ('/import/import_parse_list')
 				->with('tmpdata',$tmpdata)
